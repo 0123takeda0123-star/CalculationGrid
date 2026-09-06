@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>ひっさんグリッド</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+  <div id="titleArea">
+    <h1>ひっ算ノート</h1>
+    <button id="howToButton" onclick="openHowTo()">使い方</button>
+  </div>
+
+  <div id="board">
+    <div id="grid"></div>
+    <div id="lineLayer"></div>
+  </div>
+
+  <div id="keyboard">
+    <div id="mainKeys">
+      <div class="dragHandle">⠿⠿</div>
+
+      <!-- 演算子 -->
+      <button onclick="input('+')">+</button>
+      <button onclick="input('-')">-</button>
+      <button onclick="input('×')">×</button>
+      <button onclick="input('⟌')">⟌</button>
+
+      <!-- 数字 -->
+      <button onclick="input('7')">7</button>
+      <button onclick="input('8')">8</button>
+      <button onclick="input('9')">9</button>
+
+      <!-- 7・8・9 / 4・5・6 / 1・2・3 の3段ぶち抜き -->
+      <button id="expandButton" class="highButton" onclick="expandKeys()">▶</button>
+
+      <button onclick="input('4')">4</button>
+      <button onclick="input('5')">5</button>
+      <button onclick="input('6')">6</button>
+
+      <button onclick="input('1')">1</button>
+      <button onclick="input('2')">2</button>
+      <button onclick="input('3')">3</button>
+
+      <!-- 右上・0・消去 -->
+      <button onclick="smallMode()" title="右上入力">
+        <svg viewBox="0 0 100 100" style="width:1.3em; height:1.3em;">
+          <rect x="10" y="10" width="80" height="80" rx="10" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="14 10" opacity="0.35" />
+          <rect x="50" y="10" width="40" height="40" rx="6" fill="currentColor" />
+        </svg>
+      </button>
+
+      <button onclick="input('0')">0</button>
+
+      <button onclick="erase()">
+        <svg viewBox="0 0 1000 1000" style="width:1em; height:1em; fill:none; stroke:black; stroke-width:60; stroke-linecap:round; stroke-linejoin:round;">
+          <path d="M535.6,783.4l14.1,14.1l381.8-381.8L612.2,96.3L230.3,478.2l14.1,14.1L131.3,605.4c-31.2,31.2-31.2,81.9,0,113.1L312.7,900 H760v-40H459L535.6,783.4z M612.2,152.9L875,415.7L549.7,741L286.9,478.2L612.2,152.9z M402.4,860h-73.1L159.6,690.3 c-15.6-15.6-15.6-41,0-56.6l113.1-113.1l234.6,234.6L402.4,860z"></path>
+        </svg>
+      </button>
+
+      <button id="hintButton" class="highButton" onclick="hint()">！</button>
+
+      <!-- 行列追加 -->
+      <button onclick="addLeft()">←⁺</button>
+      <button onclick="addRow()">↓⁺</button>
+      <button onclick="addColumn()">→⁺</button>
+
+      <!-- その他 -->
+      <button onclick="exportPNG()" title="画像を出力（コピー＆保存）">📷</button>
+      <button onclick="addSlash()" title="斜線を乗せる">／</button>
+      <button onclick="clearGrid()" title="全消去">
+        <svg viewBox="0 0 100 100" style="width:1em; height:1em; fill:none; stroke:currentColor; stroke-width:6; stroke-linecap:round;">
+          <path d="M50 30V12M50 70v18 M70 50h18M30 50H12 M64.1 35.9l12.8-12.8 M35.9 64.1l-12.8 12.8 M64.1 64.1l12.8 12.8 M35.9 35.9L23.1 23.1" />
+        </svg>
+      </button>
+
+      <div></div>
+    </div>
+  </div>
+
+  <!-- =========================
+       ヒントウィザード
+  ========================= -->
+  <div id="hintBox">
+    <div id="hintHeader">
+      <span>⠿ヒント⠿</span>
+      <button id="hintCloseButton" onclick="closeHint()">×</button>
+    </div>
+
+    <div id="hintCellArea">
+      <div id="hintCell" onclick="selectHintCell()">
+        <span id="hintCellText"></span>
+      </div>
+    </div>
+
+    <div id="hintTitle">
+      「<span id="hintDan"></span>」の段
+    </div>
+
+    <div id="hintList"></div>
+  </div>
+
+  <!-- =========================
+       使い方ダイアログ
+  ========================= -->
+  <div id="howToBox">
+    <div id="howToHeader">
+      <span>使い方</span>
+      <button id="howToCloseButton" onclick="closeHowTo()">×</button>
+    </div>
+
+    <div id="howToViewer">
+      <button class="howToArrow" onclick="prevHowTo()">◀</button>
+      <div id="howToImageArea">
+        <img id="howToImage" src="" alt="画像を準備中">
+      </div>
+      <button class="howToArrow" onclick="nextHowTo()">▶</button>
+    </div>
+
+    <div id="howToPage">
+      <span id="howToCurrentPage">1</span> / <span id="howToTotalPage">1</span>
+    </div>
+  </div>
+  <script src="./script.js"></script>
+</body>
+</html>
