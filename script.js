@@ -1,4 +1,3 @@
-  <script>
     // =====================
     // 特殊記号SVG
     // =====================
@@ -740,19 +739,16 @@ async function exportPNG() {
     let howToIndex = 0;
 
     // =========================
-    // 使い方画像を事前取得
+    // 使い方画像
     // =========================
-    function loadHowToImages() {
-      google.script.run
-        .withSuccessHandler(data => {
-          console.log("使い方画像取得:", data.length, "件");
-          howToImageData = data;
-        })
-        .withFailureHandler(error => {
-          console.error("使い方画像の取得に失敗:", error);
-        })
-        .getHowToImages();
-    }
+    
+    const howToImageData = [
+      "./images/howto1.png",
+      "./images/howto2.png"
+    ];
+    
+    // 現在表示している画像番号
+    let howToIndex = 0;
 
     // =========================
     // 使い方を開く
@@ -829,11 +825,9 @@ async function exportPNG() {
     // =========================
     window.addEventListener("DOMContentLoaded", () => {
       init();
-      loadHowToImages();
     });
 
     function isIPad() {
   return /iPad/i.test(navigator.userAgent)
     || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
-  </script>
