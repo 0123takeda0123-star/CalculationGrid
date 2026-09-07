@@ -733,8 +733,8 @@ async function exportPNG() {
     // =========================
     
     const howToImageData = [
-      "./images/howto1.png",
-      "./images/howto2.png"
+      "./images/howto1.jpg",
+      "./images/howto2.jpg"
     ];
     
     // 現在表示している画像番号
