@@ -808,26 +808,31 @@ function clearGrid() {
       hintMoving = false;
     });
 
-   // =========================
+
+// =========================
+// 使い方画像
+// =========================
+const howToImageData = [
+  "images/howTo1.jpg",
+  "images/howTo2.jpg"
+];
+
+let howToIndex = 0;
+
+
+// =========================
 // 使い方を開く
 // =========================
 function openHowTo() {
   const box = document.getElementById("howToBox");
 
-// 使い方画像
-const howToImageData = [
-  "images/howTo1.jpg",
-  "images/howTo2.jpg"
-];  
-    
-howToIndex = 0;
-
-
+  howToIndex = 0;
 
   box.style.display = "flex";
 
   renderHowTo();
 }
+
 
 // =========================
 // 使い方を閉じる
@@ -835,6 +840,7 @@ howToIndex = 0;
 function closeHowTo() {
   document.getElementById("howToBox").style.display = "none";
 }
+
 
 // =========================
 // 画像を表示
@@ -854,6 +860,7 @@ function renderHowTo() {
   image.src = howToImageData[howToIndex];
 }
 
+
 // =========================
 // 次の画像
 // =========================
@@ -871,6 +878,7 @@ function nextHowTo() {
 
   renderHowTo();
 }
+
 
 // =========================
 // 前の画像
