@@ -27,11 +27,12 @@
     // =====================
     // 基本データ
     // =====================
-    let rows = 5;
-    let cols = 5;
-    let cellsData = [];
-    let selectedPos = null;
-    let inputMode = "main";
+let rows = 5;
+let cols = 5;
+let cellsData = [];
+let selectedPos = null;
+let inputMode = "main";
+let mergedCells = [];
 
     // =====================
     // ヒントウィザード
@@ -98,12 +99,52 @@
           cell.dataset.row = r;
           cell.dataset.col = c;
 
-          // =====================
-          // 選択ハイライト
-          // =====================
-          if (selectedPos && selectedPos.r === r && selectedPos.c === c) {
-            cell.classList.add(inputMode === "small" ? "smallSelected" : "selected");
-          }
+ 
+// =====================
+// 選択ハイライト
+// =====================
+const selectedMerge = selectedPos
+  ? mergedCells.find(m =>
+      m.row === selectedPos.r &&
+      m.col === selectedPos.c
+    )
+  : null;
+
+const isSelected =
+  selectedPos &&
+  selectedPos.c === c &&
+  (
+    selectedPos.r === r ||
+    (
+      selectedMerge &&
+      r === selectedPos.r + 1
+    )
+  );
+if (isSelected) {
+  cell.classList.add(
+    inputMode === "small" ? "smallSelected" : "selected"
+  );
+}
+
+// =====================
+// 縦2セル結合
+// =====================
+const merge = mergedCells.find(m =>
+  m.col === c &&
+  (m.row === r || m.row + 1 === r)
+);
+
+if (merge) {
+  if (merge.row === r) {
+    // 上セル
+    cell.style.borderBottom = "none";
+  }
+
+  if (merge.row + 1 === r) {
+    // 下セル
+    cell.style.borderTop = "none";
+  }
+}
 
           // =====================
           // 右上小文字
@@ -121,10 +162,37 @@
           // =====================
           // セル内容
           // =====================
-          cell.innerHTML = `
-            ${renderSymbol(cellsData[r][c].main)}
-            <span class="smallText">${smallDisplay}</span>
-          `;
+const isMergedTop = mergedCells.some(m =>
+  m.row === r &&
+  m.col === c
+);
+
+const isMergedBottom = mergedCells.some(m =>
+  m.row + 1 === r &&
+  m.col === c
+);
+
+if (isMergedTop) {
+  cell.innerHTML = `
+    <div class="mergedMain">
+      ${renderSymbol(cellsData[r][c].main)}
+    </div>
+    <span class="smallText">${smallDisplay}</span>
+  `;
+
+  cell.style.zIndex = "10";
+
+} else if (isMergedBottom) {
+  cell.innerHTML = `
+    <span class="smallText">${smallDisplay}</span>
+  `;
+
+} else {
+  cell.innerHTML = `
+    ${renderSymbol(cellsData[r][c].main)}
+    <span class="smallText">${smallDisplay}</span>
+  `;
+}
 
           // =====================
           // タップ処理
@@ -133,8 +201,10 @@
             let now = Date.now();
 
             // メインボードのセルを選択
-            selectedTarget = { type: "main" };
-            selectedPos = { r, c };
+selectedTarget = { type: "main" };
+
+const pos = getLogicalPosition(r, c);
+selectedPos = pos;
 
             // 300ms以内の同一セルダブルタップで「上線（計算線）」の追加/削除
             if (lastTapPos && lastTapPos.r === r && lastTapPos.c === c && (now - lastTapTime < 300)) {
@@ -161,6 +231,7 @@
       }
 
       drawLines();
+      //drawMergedCell();
     }
 
     // =====================
@@ -323,15 +394,17 @@
         });
       }
 
-      // 上線・斜線を右へ1つシフト
-      lines.forEach(l => { l.col++; });
+lines.forEach(l => { l.col++; });
+dots.forEach(d => { d.col++; });
 
-      // 「.」も右へ1つシフト
-      dots.forEach(d => { d.col++; });
+mergedCells.forEach(m => {
+  m.col++;
+});
 
-      if (selectedPos) {
-        selectedPos.c++;
-      }
+if (selectedPos) {
+  selectedPos.c++;
+}
+
 
       render();
     }
@@ -394,6 +467,8 @@
 
         layer.appendChild(lineContainer);
       });
+
+
 
       // =====================
       // 「.」を描画
@@ -548,21 +623,26 @@ async function exportPNG() {
     // =====================
     // 全消去
     // =====================
-    function clearGrid() {
-      lines = [];
-      dots = [];
+function clearGrid() {
+  if (!window.confirm("すべてのマスが空っぽになります")) {
+  return;
+}
+  
+  lines = [];
+  dots = [];
 
-      selectedPos = null;
-      selectedTarget = null;
+  selectedPos = null;
+  selectedTarget = null;
+  mergedCells = [];
 
-      // ヒントも全消去
-      hintValue = "";
+  // ヒントも全消去
+  hintValue = "";
 
-      init();
+  init();
 
-      renderHintCell();
-      renderHint();
-    }
+  renderHintCell();
+  renderHint();
+}
 
     // =====================
     // キーボードドラッグ
@@ -729,16 +809,29 @@ async function exportPNG() {
     });
 
     // =========================
-    // 使い方画像
+    // 使い方ダイアログ
     // =========================
-    
-    const howToImageData = [
-      "./images/howTo1.jpg",
-      "./images/howTo2.jpg"
-    ];
-    
+
+    // GASから取得した画像データ
+    let howToImageData = [];
+
     // 現在表示している画像番号
     let howToIndex = 0;
+
+    // =========================
+    // 使い方画像を事前取得
+    // =========================
+    function loadHowToImages() {
+      google.script.run
+        .withSuccessHandler(data => {
+          console.log("使い方画像取得:", data.length, "件");
+          howToImageData = data;
+        })
+        .withFailureHandler(error => {
+          console.error("使い方画像の取得に失敗:", error);
+        })
+        .getHowToImages();
+    }
 
     // =========================
     // 使い方を開く
@@ -815,9 +908,66 @@ async function exportPNG() {
     // =========================
     window.addEventListener("DOMContentLoaded", () => {
       init();
+      loadHowToImages();
     });
 
     function isIPad() {
-  return /iPad/i.test(navigator.userAgent)
+    return /iPad/i.test(navigator.userAgent)
     || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    }
+    
+function getLogicalPosition(r, c) {
+  const merge = mergedCells.find(m =>
+    m.col === c &&
+    (r === m.row || r === m.row + 1)
+  );
+
+  if (merge) {
+    return {
+      r: merge.row,
+      c: merge.col
+    };
+  }
+
+  return { r, c };
+}
+
+
+
+// データ構造のイメージ: mergedCells = [{ row: 0, col: 1 }, { row: 2, col: 3 }]
+
+function toggleVerticalMerge() {
+  if (!selectedPos) return;
+
+  const { r, c } = selectedPos;
+
+  // 1. 選択されたセル(r, c)が含まれる既存の結合を探す（上セル起点 or 下セル起点）
+  const existingIndex = mergedCells.findIndex(cell => 
+    cell.col === c && (cell.row === r || cell.row === r - 1)
+  );
+
+  if (existingIndex !== -1) {
+    // 既存の結合に含まれていれば解除（配列から削除）
+    mergedCells.splice(existingIndex, 1);
+  } else {
+    // 2. 新規結合を行う場合のチェック
+    
+    // 最下行の場合は下へ結合できない
+    if (r + 1 >= rows) return;
+
+    // 下のセル(r + 1, c)が「既に別の結合に含まれている」場合は重複防止のため処理しない
+    const isBottomCellAlreadyMerged = mergedCells.some(cell => 
+      cell.col === c && (cell.row === r + 1 || cell.row === r)
+    );
+    if (isBottomCellAlreadyMerged) return;
+
+    // 新規結合を追加
+    mergedCells.push({
+      row: r,
+      col: c
+    });
+  }
+
+  // 再描画
+  render();
 }
