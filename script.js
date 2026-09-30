@@ -808,107 +808,86 @@ function clearGrid() {
       hintMoving = false;
     });
 
-    // =========================
-    // 使い方ダイアログ
-    // =========================
+   // =========================
+// 使い方を開く
+// =========================
+function openHowTo() {
+  const box = document.getElementById("howToBox");
 
-    // GASから取得した画像データ
-    let howToImageData = [];
+  howToIndex = 0;
 
-    // 現在表示している画像番号
-    let howToIndex = 0;
+  box.style.display = "flex";
 
-    // =========================
-    // 使い方画像を事前取得
-    // =========================
-    function loadHowToImages() {
-      google.script.run
-        .withSuccessHandler(data => {
-          console.log("使い方画像取得:", data.length, "件");
-          howToImageData = data;
-        })
-        .withFailureHandler(error => {
-          console.error("使い方画像の取得に失敗:", error);
-        })
-        .getHowToImages();
-    }
+  renderHowTo();
+}
 
-    // =========================
-    // 使い方を開く
-    // =========================
-    function openHowTo() {
-      const box = document.getElementById("howToBox");
-      howToIndex = 0;
-      box.style.display = "flex";
-      renderHowTo();
-    }
+// =========================
+// 使い方を閉じる
+// =========================
+function closeHowTo() {
+  document.getElementById("howToBox").style.display = "none";
+}
 
-    // =========================
-    // 使い方を閉じる
-    // =========================
-    function closeHowTo() {
-      document.getElementById("howToBox").style.display = "none";
-    }
+// =========================
+// 画像を表示
+// =========================
+function renderHowTo() {
+  if (howToImageData.length === 0) {
+    return;
+  }
 
-    // =========================
-    // 画像を表示
-    // =========================
-    function renderHowTo() {
-      if (howToImageData.length === 0) {
-        return;
-      }
+  const image = document.getElementById("howToImage");
+  const currentPage = document.getElementById("howToCurrentPage");
+  const totalPage = document.getElementById("howToTotalPage");
 
-      const image = document.getElementById("howToImage");
-      const currentPage = document.getElementById("howToCurrentPage");
-      const totalPage = document.getElementById("howToTotalPage");
+  currentPage.textContent = howToIndex + 1;
+  totalPage.textContent = howToImageData.length;
 
-      currentPage.textContent = howToIndex + 1;
-      totalPage.textContent = howToImageData.length;
-      image.src = howToImageData[howToIndex];
-    }
+  image.src = howToImageData[howToIndex];
+}
 
-    // =========================
-    // 次の画像
-    // =========================
-    function nextHowTo() {
-      if (howToImageData.length === 0) {
-        return;
-      }
+// =========================
+// 次の画像
+// =========================
+function nextHowTo() {
+  if (howToImageData.length === 0) {
+    return;
+  }
 
-      howToIndex++;
+  howToIndex++;
 
-      // 最後の次は最初へ
-      if (howToIndex >= howToImageData.length) {
-        howToIndex = 0;
-      }
+  // 最後の次は最初へ
+  if (howToIndex >= howToImageData.length) {
+    howToIndex = 0;
+  }
 
-      renderHowTo();
-    }
+  renderHowTo();
+}
 
-    // =========================
-    // 前の画像
-    // =========================
-    function prevHowTo() {
-      if (howToImageData.length === 0) {
-        return;
-      }
+// =========================
+// 前の画像
+// =========================
+function prevHowTo() {
+  if (howToImageData.length === 0) {
+    return;
+  }
 
-      howToIndex--;
+  howToIndex--;
 
-      // 最初の前は最後へ
-      if (howToIndex < 0) {
-        howToIndex = howToImageData.length - 1;
-      }
+  // 最初の前は最後へ
+  if (howToIndex < 0) {
+    howToIndex = howToImageData.length - 1;
+  }
 
-      renderHowTo();
-    }
+  renderHowTo();
+}
 
     // =========================
     // ページ読み込み時
     // =========================
     window.addEventListener("DOMContentLoaded", () => {
       init();
-      loadHowToImages();
+
     });
 
     function isIPad() {
