@@ -816,10 +816,10 @@ function openHowTo() {
 
 // 使い方画像
 const howToImageData = [
-  "images/howTo1.png",
-  "images/howTo2.png",
-  "images/howto/03.png",
-  "images/howto/04.png"
+  "images/howTo1.jpg",
+  "images/howTo2.jpg",
+  "images/howTo3.jpg",
+  "images/howTo4.jpg"
 ];  
     
 howToIndex = 0;
