@@ -1,23 +1,14 @@
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-  <meta charset="UTF-8">
-  <title>ひっさんグリッド</title>
-  <link rel="stylesheet" href="./style.css">
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-</head>
-
 <body>
+
   <div id="titleArea">
     <h1>ひっさんグリッド</h1>
     <button id="howToButton" onclick="openHowTo()">使い方</button>
   </div>
 
-  <div id="board">
-    <div id="grid"></div>
-    <div id="lineLayer"></div>
-  </div>
+<div id="board">
+  <div id="grid"></div>
+  <div id="lineLayer"></div>
+</div>
 
   <div id="keyboard">
     <div id="mainKeys">
@@ -61,7 +52,7 @@
         </svg>
       </button>
 
-      <button id="hintButton" class="highButton" onclick="hint()">！</button>
+      <button id="hintButton" class="highButton vertical" onclick="hint()">ヒント</button>
 
       <!-- 行列追加 -->
       <button onclick="addLeft()">←⁺</button>
@@ -76,8 +67,12 @@
           <path d="M50 30V12M50 70v18 M70 50h18M30 50H12 M64.1 35.9l12.8-12.8 M35.9 64.1l-12.8 12.8 M64.1 64.1l12.8 12.8 M35.9 35.9L23.1 23.1" />
         </svg>
       </button>
-
-      <div></div>
+<button onclick="toggleVerticalMerge()">
+  <svg viewBox="0 0 100 100" style="width:1em; height:1em; fill:none; stroke:currentColor; stroke-width:6; stroke-linecap:round;">
+  <path d="M 12 30 V 12 H 30 M 70 12 H 88 V 30 M 12 70 V 88 H 30 M 70 88 H 88 V 70 M 50 12 V 44 M 32 26 L 50 44 L 68 26 M 50 88 V 56 M 32 74 L 50 56 L 68 74" />
+</svg>
+        </button>
+      
     </div>
   </div>
 
@@ -124,6 +119,6 @@
       <span id="howToCurrentPage">1</span> / <span id="howToTotalPage">1</span>
     </div>
   </div>
-  <script src="./script.js"></script>
+
+
 </body>
-</html>
