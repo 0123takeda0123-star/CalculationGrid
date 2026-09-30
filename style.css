@@ -178,6 +178,21 @@
       background-color: #fff;
     }
 
+    .mergedMain {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 200%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  pointer-events: none;
+  z-index: 10;
+}
+
     .mainText {
       font-size: var(--font-size);
     }
@@ -247,6 +262,10 @@
       grid-column: 1 / -1;
     }
 
+    .vertical{
+      writing-mode: vertical-rl;
+    }
+
     button {
       width: var(--key-size);
       height: var(--key-size);
@@ -272,6 +291,7 @@
 
     #expandButton {
       grid-row: 3 / span 3;
+      border: 3px solid #888;
     }
 
     #hintButton {
