@@ -814,7 +814,8 @@ function clearGrid() {
 // =========================
 const howToImageData = [
   "images/howTo1.jpg",
-  "images/howTo2.jpg"
+  "images/howTo2.jpg",
+  "images/howTo3.jpg"
 ];
 
 let howToIndex = 0;
