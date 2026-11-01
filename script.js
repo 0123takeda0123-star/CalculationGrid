@@ -567,27 +567,314 @@ if (selectedPos) {
     // =====================
     // 画像の保存＆コピー統合処理
     // =====================
-    async function captureBoard() {
-      const tempPos = selectedPos;
-      selectedPos = null;
-      render();
+    // =====================
+// 画像生成
+// =====================
+async function captureBoard() {
+  const tempPos = selectedPos;
 
-      const target = document.getElementById("board");
+  selectedPos = null;
+  render();
 
-      const canvas = await html2canvas(target, {
-        backgroundColor: "white",
-        scale: 2
-      });
+  try {
+    const target = document.getElementById("board");
 
-      selectedPos = tempPos;
-      render();
+    return await html2canvas(target, {
+      backgroundColor: "white",
+      scale: 2
+    });
 
-      return canvas;
-    }
+  } finally {
+    selectedPos = tempPos;
+    render();
+  }
+}
 
+
+// =====================
+// Canvas → PNG Blob
+// =====================
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("PNGの生成に失敗しました"));
+      }
+    }, "image/png");
+  });
+}
+
+
+// =====================
+// スクリーンショット出力
+// =====================
 async function exportPNG() {
   try {
+    // ① 画像生成
     const canvas = await captureBoard();
+    const blob = await canvasToBlob(canvas);
+
+    // ② iPad Safari専用処理
+    if (isIPadSafari()) {
+      showSaveDialog(blob);
+      return;
+    }
+
+    // ③ iPad以外 → 従来どおりダウンロード
+    if (!isIPad()) {
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "hissan.png";
+      a.click();
+
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+
+    // ④ 従来どおりクリップボードへコピー
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": blob
+        })
+      ]);
+    } catch (err) {
+      console.warn("クリップボード制限:", err);
+    }
+
+  } catch (e) {
+    console.error("画像生成エラー:", e);
+    alert("画像の生成に失敗しました。");
+  }
+}
+
+
+// =====================
+// iPad Safari用 保存ダイアログ
+// =====================
+function showSaveDialog(blob) {
+
+  // 既存ダイアログがあれば削除
+  const oldDialog = document.getElementById("saveDialog");
+
+  if (oldDialog) {
+    oldDialog.remove();
+  }
+
+  // ダイアログ本体
+  const overlay = document.createElement("div");
+  overlay.id = "saveDialog";
+
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "99999",
+    background: "rgba(0,0,0,0.45)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "20px"
+  });
+
+  // ダイアログ内部
+  const dialog = document.createElement("div");
+
+  Object.assign(dialog.style, {
+    width: "100%",
+    maxWidth: "320px",
+    background: "white",
+    borderRadius: "14px",
+    padding: "22px",
+    boxSizing: "border-box",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+    color: "#222",
+    fontFamily: "sans-serif",
+    textAlign: "center"
+  });
+
+  // タイトル
+  const title = document.createElement("div");
+  title.textContent = "画像の保存";
+  Object.assign(title.style, {
+    fontSize: "18px",
+    fontWeight: "bold",
+    marginBottom: "8px"
+  });
+
+  // 説明
+  const description = document.createElement("div");
+  description.textContent = "保存方法を選択してください";
+  Object.assign(description.style, {
+    fontSize: "13px",
+    color: "#666",
+    marginBottom: "20px"
+  });
+
+  // 状態表示
+  const status = document.createElement("div");
+  Object.assign(status.style, {
+    fontSize: "13px",
+    color: "#555",
+    marginTop: "12px",
+    minHeight: "18px"
+  });
+
+  // ボタン共通スタイル
+  function createButton(label, background) {
+    const button = document.createElement("button");
+
+    button.textContent = label;
+
+    Object.assign(button.style, {
+      display: "block",
+      width: "100%",
+      padding: "13px",
+      marginTop: "10px",
+      border: "none",
+      borderRadius: "8px",
+      background: background,
+      color: "white",
+      fontSize: "15px",
+      fontWeight: "bold",
+      cursor: "pointer"
+    });
+
+    return button;
+  }
+
+  // =====================
+  // クリップボードコピー
+  // =====================
+  const copyButton = createButton(
+    "クリップボードにコピー",
+    "#1a73e8"
+  );
+
+  copyButton.onclick = async () => {
+
+    try {
+      if (
+        !navigator.clipboard ||
+        !navigator.clipboard.write ||
+        typeof ClipboardItem === "undefined"
+      ) {
+        throw new Error("画像コピーに対応していません");
+      }
+
+      copyButton.disabled = true;
+      status.textContent = "コピーしています...";
+
+      // 重要：
+      // このwrite()をボタン操作から直接発火させる
+      const writePromise = navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": blob
+        })
+      ]);
+
+      await writePromise;
+
+      status.textContent = "コピーしました。";
+      copyButton.textContent = "コピー完了";
+
+      setTimeout(() => {
+        overlay.remove();
+      }, 800);
+
+    } catch (err) {
+      console.error("コピー失敗:", err);
+
+      copyButton.disabled = false;
+      status.textContent =
+        "コピーできませんでした。Safariの権限を確認してください。";
+    }
+  };
+
+
+  // =====================
+  // PNGを別タブで開く
+  // =====================
+  const saveButton = createButton(
+    "PNGを別タブで開く",
+    "#34a853"
+  );
+
+  saveButton.onclick = () => {
+
+    const url = URL.createObjectURL(blob);
+
+    // ボタン操作中に別タブを開く
+    const newTab = window.open(url, "_blank");
+
+    if (newTab) {
+
+      newTab.opener = null;
+
+      status.textContent = "PNGを別タブで開きました。";
+
+      overlay.remove();
+
+      // 表示に十分な時間を確保してから解放
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 120000);
+
+    } else {
+
+      // ポップアップブロック対策
+      status.textContent =
+        "別タブを開けませんでした。下のリンクを押してください。";
+
+      const fallbackLink = document.createElement("a");
+
+      fallbackLink.href = url;
+      fallbackLink.target = "_blank";
+      fallbackLink.rel = "noopener";
+      fallbackLink.textContent = "PNGを開く";
+
+      Object.assign(fallbackLink.style, {
+        display: "block",
+        marginTop: "12px",
+        color: "#1a73e8",
+        fontSize: "15px"
+      });
+
+      dialog.appendChild(fallbackLink);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 120000);
+    }
+  };
+
+
+  // =====================
+  // キャンセル
+  // =====================
+  const cancelButton = createButton(
+    "キャンセル",
+    "#888"
+  );
+
+  cancelButton.onclick = () => {
+    overlay.remove();
+  };
+
+
+  // 組み立て
+  dialog.appendChild(title);
+  dialog.appendChild(description);
+  dialog.appendChild(copyButton);
+  dialog.appendChild(saveButton);
+  dialog.appendChild(cancelButton);
+  dialog.appendChild(status);
+
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+}
 
     // =====================
     // iPad以外 → ダウンロード
@@ -598,6 +885,19 @@ async function exportPNG() {
       a.download = "hissan.png";
       a.click();
     }
+
+    // =====================
+// iPad Safari判定
+// =====================
+function isIPadSafari() {
+  const ua = navigator.userAgent;
+
+  const isSafari =
+    /Safari/i.test(ua) &&
+    !/(CriOS|FxiOS|EdgiOS|OPiOS|Chrome|Chromium|Edg|Firefox|OPR)/i.test(ua);
+
+  return isIPad() && isSafari;
+}
 
     // =====================
     // 全端末 → クリップボードへコピー
