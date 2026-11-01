@@ -27,12 +27,12 @@
     // =====================
     // 基本データ
     // =====================
-let rows = 5;
-let cols = 5;
-let cellsData = [];
-let selectedPos = null;
-let inputMode = "main";
-let mergedCells = [];
+    let rows = 5;
+    let cols = 5;
+    let cellsData = [];
+    let selectedPos = null;
+    let inputMode = "main";
+    let mergedCells = [];
 
     // =====================
     // ヒントウィザード
@@ -59,7 +59,6 @@ let mergedCells = [];
 
     // 最後にタップしたセル位置（{r: 行番号, c: 列番号} または null）
     let lastTapPos = null;
-
 
     // =====================
     // 初期化
@@ -99,52 +98,44 @@ let mergedCells = [];
           cell.dataset.row = r;
           cell.dataset.col = c;
 
- 
-// =====================
-// 選択ハイライト
-// =====================
-const selectedMerge = selectedPos
-  ? mergedCells.find(m =>
-      m.row === selectedPos.r &&
-      m.col === selectedPos.c
-    )
-  : null;
+          // =====================
+          // 選択ハイライト
+          // =====================
+          const selectedMerge = selectedPos
+            ? mergedCells.find(m => m.row === selectedPos.r && m.col === selectedPos.c)
+            : null;
 
-const isSelected =
-  selectedPos &&
-  selectedPos.c === c &&
-  (
-    selectedPos.r === r ||
-    (
-      selectedMerge &&
-      r === selectedPos.r + 1
-    )
-  );
-if (isSelected) {
-  cell.classList.add(
-    inputMode === "small" ? "smallSelected" : "selected"
-  );
-}
+          const isSelected =
+            selectedPos &&
+            selectedPos.c === c &&
+            (
+              selectedPos.r === r ||
+              (
+                selectedMerge &&
+                r === selectedPos.r + 1
+              )
+            );
 
-// =====================
-// 縦2セル結合
-// =====================
-const merge = mergedCells.find(m =>
-  m.col === c &&
-  (m.row === r || m.row + 1 === r)
-);
+          if (isSelected) {
+            cell.classList.add(inputMode === "small" ? "smallSelected" : "selected");
+          }
 
-if (merge) {
-  if (merge.row === r) {
-    // 上セル
-    cell.style.borderBottom = "none";
-  }
+          // =====================
+          // 縦2セル結合
+          // =====================
+          const merge = mergedCells.find(m => m.col === c && (m.row === r || m.row + 1 === r));
 
-  if (merge.row + 1 === r) {
-    // 下セル
-    cell.style.borderTop = "none";
-  }
-}
+          if (merge) {
+            if (merge.row === r) {
+              // 上セル
+              cell.style.borderBottom = "none";
+            }
+
+            if (merge.row + 1 === r) {
+              // 下セル
+              cell.style.borderTop = "none";
+            }
+          }
 
           // =====================
           // 右上小文字
@@ -162,37 +153,27 @@ if (merge) {
           // =====================
           // セル内容
           // =====================
-const isMergedTop = mergedCells.some(m =>
-  m.row === r &&
-  m.col === c
-);
+          const isMergedTop = mergedCells.some(m => m.row === r && m.col === c);
+          const isMergedBottom = mergedCells.some(m => m.row + 1 === r && m.col === c);
 
-const isMergedBottom = mergedCells.some(m =>
-  m.row + 1 === r &&
-  m.col === c
-);
-
-if (isMergedTop) {
-  cell.innerHTML = `
-    <div class="mergedMain">
-      ${renderSymbol(cellsData[r][c].main)}
-    </div>
-    <span class="smallText">${smallDisplay}</span>
-  `;
-
-  cell.style.zIndex = "10";
-
-} else if (isMergedBottom) {
-  cell.innerHTML = `
-    <span class="smallText">${smallDisplay}</span>
-  `;
-
-} else {
-  cell.innerHTML = `
-    ${renderSymbol(cellsData[r][c].main)}
-    <span class="smallText">${smallDisplay}</span>
-  `;
-}
+          if (isMergedTop) {
+            cell.innerHTML = `
+              <div class="mergedMain">
+                ${renderSymbol(cellsData[r][c].main)}
+              </div>
+              <span class="smallText">${smallDisplay}</span>
+            `;
+            cell.style.zIndex = "10";
+          } else if (isMergedBottom) {
+            cell.innerHTML = `
+              <span class="smallText">${smallDisplay}</span>
+            `;
+          } else {
+            cell.innerHTML = `
+              ${renderSymbol(cellsData[r][c].main)}
+              <span class="smallText">${smallDisplay}</span>
+            `;
+          }
 
           // =====================
           // タップ処理
@@ -201,10 +182,10 @@ if (isMergedTop) {
             let now = Date.now();
 
             // メインボードのセルを選択
-selectedTarget = { type: "main" };
+            selectedTarget = { type: "main" };
 
-const pos = getLogicalPosition(r, c);
-selectedPos = pos;
+            const pos = getLogicalPosition(r, c);
+            selectedPos = pos;
 
             // 300ms以内の同一セルダブルタップで「上線（計算線）」の追加/削除
             if (lastTapPos && lastTapPos.r === r && lastTapPos.c === c && (now - lastTapTime < 300)) {
@@ -394,17 +375,16 @@ selectedPos = pos;
         });
       }
 
-lines.forEach(l => { l.col++; });
-dots.forEach(d => { d.col++; });
+      lines.forEach(l => { l.col++; });
+      dots.forEach(d => { d.col++; });
 
-mergedCells.forEach(m => {
-  m.col++;
-});
+      mergedCells.forEach(m => {
+        m.col++;
+      });
 
-if (selectedPos) {
-  selectedPos.c++;
-}
-
+      if (selectedPos) {
+        selectedPos.c++;
+      }
 
       render();
     }
@@ -467,8 +447,6 @@ if (selectedPos) {
 
         layer.appendChild(lineContainer);
       });
-
-
 
       // =====================
       // 「.」を描画
@@ -568,381 +546,335 @@ if (selectedPos) {
     // 画像の保存＆コピー統合処理
     // =====================
     // =====================
-// 画像生成
-// =====================
-async function captureBoard() {
-  const tempPos = selectedPos;
-
-  selectedPos = null;
-  render();
-
-  try {
-    const target = document.getElementById("board");
-
-    return await html2canvas(target, {
-      backgroundColor: "white",
-      scale: 2
-    });
-
-  } finally {
-    selectedPos = tempPos;
-    render();
-  }
-}
-
-
-// =====================
-// Canvas → PNG Blob
-// =====================
-function canvasToBlob(canvas) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(blob => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("PNGの生成に失敗しました"));
-      }
-    }, "image/png");
-  });
-}
-
-
-// =====================
-// スクリーンショット出力
-// =====================
-async function exportPNG() {
-  try {
-    // ① 画像生成
-    const canvas = await captureBoard();
-    const blob = await canvasToBlob(canvas);
-
-    // ② iPad Safari専用処理
-    if (isIPadSafari()) {
-      showSaveDialog(blob);
-      return;
-    }
-
-    // ③ iPad以外 → 従来どおりダウンロード
-    if (!isIPad()) {
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "hissan.png";
-      a.click();
-
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-    }
-
-    // ④ 従来どおりクリップボードへコピー
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          "image/png": blob
-        })
-      ]);
-    } catch (err) {
-      console.warn("クリップボード制限:", err);
-    }
-
-  } catch (e) {
-    console.error("画像生成エラー:", e);
-    alert("画像の生成に失敗しました。");
-  }
-}
-
-
-// =====================
-// iPad Safari用 保存ダイアログ
-// =====================
-function showSaveDialog(blob) {
-
-  // 既存ダイアログがあれば削除
-  const oldDialog = document.getElementById("saveDialog");
-
-  if (oldDialog) {
-    oldDialog.remove();
-  }
-
-  // ダイアログ本体
-  const overlay = document.createElement("div");
-  overlay.id = "saveDialog";
-
-  Object.assign(overlay.style, {
-    position: "fixed",
-    inset: "0",
-    zIndex: "99999",
-    background: "rgba(0,0,0,0.45)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "20px"
-  });
-
-  // ダイアログ内部
-  const dialog = document.createElement("div");
-
-  Object.assign(dialog.style, {
-    width: "100%",
-    maxWidth: "320px",
-    background: "white",
-    borderRadius: "14px",
-    padding: "22px",
-    boxSizing: "border-box",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-    color: "#222",
-    fontFamily: "sans-serif",
-    textAlign: "center"
-  });
-
-  // タイトル
-  const title = document.createElement("div");
-  title.textContent = "画像の保存";
-  Object.assign(title.style, {
-    fontSize: "18px",
-    fontWeight: "bold",
-    marginBottom: "8px"
-  });
-
-  // 説明
-  const description = document.createElement("div");
-  description.textContent = "保存方法を選択してください";
-  Object.assign(description.style, {
-    fontSize: "13px",
-    color: "#666",
-    marginBottom: "20px"
-  });
-
-  // 状態表示
-  const status = document.createElement("div");
-  Object.assign(status.style, {
-    fontSize: "13px",
-    color: "#555",
-    marginTop: "12px",
-    minHeight: "18px"
-  });
-
-  // ボタン共通スタイル
-  function createButton(label, background) {
-    const button = document.createElement("button");
-
-    button.textContent = label;
-
-    Object.assign(button.style, {
-      display: "block",
-      width: "100%",
-      padding: "13px",
-      marginTop: "10px",
-      border: "none",
-      borderRadius: "8px",
-      background: background,
-      color: "white",
-      fontSize: "15px",
-      fontWeight: "bold",
-      cursor: "pointer"
-    });
-
-    return button;
-  }
-
-  // =====================
-  // クリップボードコピー
-  // =====================
-  const copyButton = createButton(
-    "クリップボードにコピー",
-    "#1a73e8"
-  );
-
-  copyButton.onclick = async () => {
-
-    try {
-      if (
-        !navigator.clipboard ||
-        !navigator.clipboard.write ||
-        typeof ClipboardItem === "undefined"
-      ) {
-        throw new Error("画像コピーに対応していません");
-      }
-
-      copyButton.disabled = true;
-      status.textContent = "コピーしています...";
-
-      // 重要：
-      // このwrite()をボタン操作から直接発火させる
-      const writePromise = navigator.clipboard.write([
-        new ClipboardItem({
-          "image/png": blob
-        })
-      ]);
-
-      await writePromise;
-
-      status.textContent = "コピーしました。";
-      copyButton.textContent = "コピー完了";
-
-      setTimeout(() => {
-        overlay.remove();
-      }, 800);
-
-    } catch (err) {
-      console.error("コピー失敗:", err);
-
-      copyButton.disabled = false;
-      status.textContent =
-        "コピーできませんでした。Safariの権限を確認してください。";
-    }
-  };
-
-
-  // =====================
-  // PNGを別タブで開く
-  // =====================
-  const saveButton = createButton(
-    "PNGを別タブで開く",
-    "#34a853"
-  );
-
-  saveButton.onclick = () => {
-
-    const url = URL.createObjectURL(blob);
-
-    // ボタン操作中に別タブを開く
-    const newTab = window.open(url, "_blank");
-
-    if (newTab) {
-
-      newTab.opener = null;
-
-      status.textContent = "PNGを別タブで開きました。";
-
-      overlay.remove();
-
-      // 表示に十分な時間を確保してから解放
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 120000);
-
-    } else {
-
-      // ポップアップブロック対策
-      status.textContent =
-        "別タブを開けませんでした。下のリンクを押してください。";
-
-      const fallbackLink = document.createElement("a");
-
-      fallbackLink.href = url;
-      fallbackLink.target = "_blank";
-      fallbackLink.rel = "noopener";
-      fallbackLink.textContent = "PNGを開く";
-
-      Object.assign(fallbackLink.style, {
-        display: "block",
-        marginTop: "12px",
-        color: "#1a73e8",
-        fontSize: "15px"
-      });
-
-      dialog.appendChild(fallbackLink);
-
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 120000);
-    }
-  };
-
-
-  // =====================
-  // キャンセル
-  // =====================
-  const cancelButton = createButton(
-    "キャンセル",
-    "#888"
-  );
-
-  cancelButton.onclick = () => {
-    overlay.remove();
-  };
-
-
-  // 組み立て
-  dialog.appendChild(title);
-  dialog.appendChild(description);
-  dialog.appendChild(copyButton);
-  dialog.appendChild(saveButton);
-  dialog.appendChild(cancelButton);
-  dialog.appendChild(status);
-
-  overlay.appendChild(dialog);
-  document.body.appendChild(overlay);
-}
-
+    // 画像生成
     // =====================
-    // iPad以外 → ダウンロード
-    // =====================
-    if (!isIPad()) {
-      const a = document.createElement("a");
-      a.href = canvas.toDataURL("image/png");
-      a.download = "hissan.png";
-      a.click();
-    }
+    async function captureBoard() {
+      const tempPos = selectedPos;
 
-    // =====================
-// iPad Safari判定
-// =====================
-function isIPadSafari() {
-  const ua = navigator.userAgent;
-
-  const isSafari =
-    /Safari/i.test(ua) &&
-    !/(CriOS|FxiOS|EdgiOS|OPiOS|Chrome|Chromium|Edg|Firefox|OPR)/i.test(ua);
-
-  return isIPad() && isSafari;
-}
-
-    // =====================
-    // 全端末 → クリップボードへコピー
-    // =====================
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
+      selectedPos = null;
+      render();
 
       try {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            "image/png": blob
-          })
-        ]);
-      } catch (err) {
-        console.warn("クリップボード制限:", err);
-      }
-    }, "image/png");
+        const target = document.getElementById("board");
 
-  } catch (e) {
-    console.error("画像生成エラー:", e);
-  }
-}
+        return await html2canvas(target, {
+          backgroundColor: "white",
+          scale: 2
+        });
+      } finally {
+        selectedPos = tempPos;
+        render();
+      }
+    }
+
+    // =====================
+    // Canvas → PNG Blob
+    // =====================
+    function canvasToBlob(canvas) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(blob => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("PNGの生成に失敗しました"));
+          }
+        }, "image/png");
+      });
+    }
+
+    // =====================
+    // スクリーンショット出力
+    // =====================
+    async function exportPNG() {
+      try {
+        // ① 画像生成
+        const canvas = await captureBoard();
+        const blob = await canvasToBlob(canvas);
+
+        // ② iPad Safari専用処理
+        if (isIPadSafari()) {
+          showSaveDialog(blob);
+          return;
+        }
+
+        // ③ iPad以外 → 従来どおりダウンロード
+        if (!isIPad()) {
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "hissan.png";
+          a.click();
+
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }
+
+        // ④ 従来どおりクリップボードへコピー
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              "image/png": blob
+            })
+          ]);
+        } catch (err) {
+          console.warn("クリップボード制限:", err);
+        }
+
+      } catch (e) {
+        console.error("画像生成エラー:", e);
+        alert("画像の生成に失敗しました。");
+      }
+    }
+
+    // =====================
+    // iPad Safari用 保存ダイアログ
+    // =====================
+    function showSaveDialog(blob) {
+      // 既存ダイアログがあれば削除
+      const oldDialog = document.getElementById("saveDialog");
+
+      if (oldDialog) {
+        oldDialog.remove();
+      }
+
+      // ダイアログ本体
+      const overlay = document.createElement("div");
+      overlay.id = "saveDialog";
+
+      Object.assign(overlay.style, {
+        position: "fixed",
+        inset: "0",
+        zIndex: "99999",
+        background: "rgba(0,0,0,0.45)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "20px"
+      });
+
+      // ダイアログ内部
+      const dialog = document.createElement("div");
+
+      Object.assign(dialog.style, {
+        width: "100%",
+        maxWidth: "320px",
+        background: "white",
+        borderRadius: "14px",
+        padding: "22px",
+        boxSizing: "border-box",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+        color: "#222",
+        fontFamily: "sans-serif",
+        textAlign: "center"
+      });
+
+      // タイトル
+      const title = document.createElement("div");
+      title.textContent = "画像の保存";
+      Object.assign(title.style, {
+        fontSize: "18px",
+        fontWeight: "bold",
+        marginBottom: "8px"
+      });
+
+      // 説明
+      const description = document.createElement("div");
+      description.textContent = "保存方法を選択してください";
+      Object.assign(description.style, {
+        fontSize: "13px",
+        color: "#666",
+        marginBottom: "20px"
+      });
+
+      // 状態表示
+      const status = document.createElement("div");
+      Object.assign(status.style, {
+        fontSize: "13px",
+        color: "#555",
+        marginTop: "12px",
+        minHeight: "18px"
+      });
+
+      // ボタン共通スタイル
+      function createButton(label, background) {
+        const button = document.createElement("button");
+
+        button.textContent = label;
+
+        Object.assign(button.style, {
+          display: "block",
+          width: "100%",
+          padding: "13px",
+          marginTop: "10px",
+          border: "none",
+          borderRadius: "8px",
+          background: background,
+          color: "white",
+          fontSize: "15px",
+          fontWeight: "bold",
+          cursor: "pointer"
+        });
+
+        return button;
+      }
+
+      // =====================
+      // クリップボードコピー
+      // =====================
+      const copyButton = createButton(
+        "クリップボードにコピー",
+        "#1a73e8"
+      );
+
+      copyButton.onclick = async () => {
+        try {
+          if (
+            !navigator.clipboard ||
+            !navigator.clipboard.write ||
+            typeof ClipboardItem === "undefined"
+          ) {
+            throw new Error("画像コピーに対応していません");
+          }
+
+          copyButton.disabled = true;
+          status.textContent = "コピーしています...";
+
+          // 重要：
+          // このwrite()をボタン操作から直接発火させる
+          const writePromise = navigator.clipboard.write([
+            new ClipboardItem({
+              "image/png": blob
+            })
+          ]);
+
+          await writePromise;
+
+          status.textContent = "コピーしました。";
+          copyButton.textContent = "コピー完了";
+
+          setTimeout(() => {
+            overlay.remove();
+          }, 800);
+
+        } catch (err) {
+          console.error("コピー失敗:", err);
+
+          copyButton.disabled = false;
+          status.textContent = "コピーできませんでした。Safariの権限を確認してください。";
+        }
+      };
+
+      // =====================
+      // PNGを別タブで開く
+      // =====================
+      const saveButton = createButton(
+        "PNGを別タブで開く",
+        "#34a853"
+      );
+
+      saveButton.onclick = () => {
+        const url = URL.createObjectURL(blob);
+
+        // ボタン操作中に別タブを開く
+        const newTab = window.open(url, "_blank");
+
+        if (newTab) {
+          newTab.opener = null;
+
+          status.textContent = "PNGを別タブで開きました。";
+
+          overlay.remove();
+
+          // 表示に十分な時間を確保してから解放
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 120000);
+        } else {
+          // ポップアップブロック対策
+          status.textContent = "別タブを開けませんでした。下のリンクを押してください。";
+
+          const fallbackLink = document.createElement("a");
+
+          fallbackLink.href = url;
+          fallbackLink.target = "_blank";
+          fallbackLink.rel = "noopener";
+          fallbackLink.textContent = "PNGを開く";
+
+          Object.assign(fallbackLink.style, {
+            display: "block",
+            marginTop: "12px",
+            color: "#1a73e8",
+            fontSize: "15px"
+          });
+
+          dialog.appendChild(fallbackLink);
+
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 120000);
+        }
+      };
+
+      // =====================
+      // キャンセル
+      // =====================
+      const cancelButton = createButton(
+        "キャンセル",
+        "#888"
+      );
+
+      cancelButton.onclick = () => {
+        overlay.remove();
+      };
+
+      // 組み立て
+      dialog.appendChild(title);
+      dialog.appendChild(description);
+      dialog.appendChild(copyButton);
+      dialog.appendChild(saveButton);
+      dialog.appendChild(cancelButton);
+      dialog.appendChild(status);
+
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
+    }
+
+    // =====================
+    // iPad Safari判定
+    // =====================
+    function isIPadSafari() {
+      const ua = navigator.userAgent;
+
+      const isSafari =
+        /Safari/i.test(ua) &&
+        !/(CriOS|FxiOS|EdgiOS|OPiOS|Chrome|Chromium|Edg|Firefox|OPR)/i.test(ua);
+
+      return isIPad() && isSafari;
+    }
+
     // =====================
     // 全消去
     // =====================
-function clearGrid() {
-  if (!window.confirm("すべてのマスが空っぽになります")) {
-  return;
-}
-  
-  lines = [];
-  dots = [];
+    function clearGrid() {
+      if (!window.confirm("すべてのマスが空っぽになります")) {
+        return;
+      }
 
-  selectedPos = null;
-  selectedTarget = null;
-  mergedCells = [];
+      lines = [];
+      dots = [];
 
-  // ヒントも全消去
-  hintValue = "";
+      selectedPos = null;
+      selectedTarget = null;
+      mergedCells = [];
 
-  init();
+      // ヒントも全消去
+      hintValue = "";
 
-  renderHintCell();
-  renderHint();
-}
+      init();
+
+      renderHintCell();
+      renderHint();
+    }
 
     // =====================
     // キーボードドラッグ
@@ -1108,162 +1040,150 @@ function clearGrid() {
       hintMoving = false;
     });
 
+    // =========================
+    // 使い方画像
+    // =========================
+    const howToImageData = [
+      "images/howTo1.jpg",
+      "images/howTo2.jpg",
+      "images/howTo3.jpg"
+    ];
 
-// =========================
-// 使い方画像
-// =========================
-const howToImageData = [
-  "images/howTo1.jpg",
-  "images/howTo2.jpg",
-  "images/howTo3.jpg"
-];
+    let howToIndex = 0;
 
-let howToIndex = 0;
+    // =========================
+    // 使い方を開く
+    // =========================
+    function openHowTo() {
+      const box = document.getElementById("howToBox");
 
+      howToIndex = 0;
 
-// =========================
-// 使い方を開く
-// =========================
-function openHowTo() {
-  const box = document.getElementById("howToBox");
+      box.style.display = "flex";
 
-  howToIndex = 0;
+      renderHowTo();
+    }
 
-  box.style.display = "flex";
+    // =========================
+    // 使い方を閉じる
+    // =========================
+    function closeHowTo() {
+      document.getElementById("howToBox").style.display = "none";
+    }
 
-  renderHowTo();
-}
+    // =========================
+    // 画像を表示
+    // =========================
+    function renderHowTo() {
+      if (howToImageData.length === 0) {
+        return;
+      }
 
+      const image = document.getElementById("howToImage");
+      const currentPage = document.getElementById("howToCurrentPage");
+      const totalPage = document.getElementById("howToTotalPage");
 
-// =========================
-// 使い方を閉じる
-// =========================
-function closeHowTo() {
-  document.getElementById("howToBox").style.display = "none";
-}
+      currentPage.textContent = howToIndex + 1;
+      totalPage.textContent = howToImageData.length;
 
+      image.src = howToImageData[howToIndex];
+    }
 
-// =========================
-// 画像を表示
-// =========================
-function renderHowTo() {
-  if (howToImageData.length === 0) {
-    return;
-  }
+    // =========================
+    // 次の画像
+    // =========================
+    function nextHowTo() {
+      if (howToImageData.length === 0) {
+        return;
+      }
 
-  const image = document.getElementById("howToImage");
-  const currentPage = document.getElementById("howToCurrentPage");
-  const totalPage = document.getElementById("howToTotalPage");
+      howToIndex++;
 
-  currentPage.textContent = howToIndex + 1;
-  totalPage.textContent = howToImageData.length;
+      // 最後の次は最初へ
+      if (howToIndex >= howToImageData.length) {
+        howToIndex = 0;
+      }
 
-  image.src = howToImageData[howToIndex];
-}
+      renderHowTo();
+    }
 
+    // =========================
+    // 前の画像
+    // =========================
+    function prevHowTo() {
+      if (howToImageData.length === 0) {
+        return;
+      }
 
-// =========================
-// 次の画像
-// =========================
-function nextHowTo() {
-  if (howToImageData.length === 0) {
-    return;
-  }
+      howToIndex--;
 
-  howToIndex++;
+      // 最初の前は最後へ
+      if (howToIndex < 0) {
+        howToIndex = howToImageData.length - 1;
+      }
 
-  // 最後の次は最初へ
-  if (howToIndex >= howToImageData.length) {
-    howToIndex = 0;
-  }
-
-  renderHowTo();
-}
-
-
-// =========================
-// 前の画像
-// =========================
-function prevHowTo() {
-  if (howToImageData.length === 0) {
-    return;
-  }
-
-  howToIndex--;
-
-  // 最初の前は最後へ
-  if (howToIndex < 0) {
-    howToIndex = howToImageData.length - 1;
-  }
-
-  renderHowTo();
-}
+      renderHowTo();
+    }
 
     // =========================
     // ページ読み込み時
     // =========================
     window.addEventListener("DOMContentLoaded", () => {
       init();
-
     });
 
     function isIPad() {
-    return /iPad/i.test(navigator.userAgent)
-    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      return /iPad/i.test(navigator.userAgent)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     }
-    
-function getLogicalPosition(r, c) {
-  const merge = mergedCells.find(m =>
-    m.col === c &&
-    (r === m.row || r === m.row + 1)
-  );
 
-  if (merge) {
-    return {
-      r: merge.row,
-      c: merge.col
-    };
-  }
+    function getLogicalPosition(r, c) {
+      const merge = mergedCells.find(m => m.col === c && (r === m.row || r === m.row + 1));
 
-  return { r, c };
-}
+      if (merge) {
+        return {
+          r: merge.row,
+          c: merge.col
+        };
+      }
 
+      return { r, c };
+    }
 
+    // データ構造のイメージ: mergedCells = [{ row: 0, col: 1 }, { row: 2, col: 3 }]
 
-// データ構造のイメージ: mergedCells = [{ row: 0, col: 1 }, { row: 2, col: 3 }]
+    function toggleVerticalMerge() {
+      if (!selectedPos) return;
 
-function toggleVerticalMerge() {
-  if (!selectedPos) return;
+      const { r, c } = selectedPos;
 
-  const { r, c } = selectedPos;
+      // 1. 選択されたセル(r, c)が含まれる既存の結合を探す（上セル起点 or 下セル起点）
+      const existingIndex = mergedCells.findIndex(cell => 
+        cell.col === c && (cell.row === r || cell.row === r - 1)
+      );
 
-  // 1. 選択されたセル(r, c)が含まれる既存の結合を探す（上セル起点 or 下セル起点）
-  const existingIndex = mergedCells.findIndex(cell => 
-    cell.col === c && (cell.row === r || cell.row === r - 1)
-  );
+      if (existingIndex !== -1) {
+        // 既存の結合に含まれていれば解除（配列から削除）
+        mergedCells.splice(existingIndex, 1);
+      } else {
+        // 2. 新規結合を行う場合のチェック
+        
+        // 最下行の場合は下へ結合できない
+        if (r + 1 >= rows) return;
 
-  if (existingIndex !== -1) {
-    // 既存の結合に含まれていれば解除（配列から削除）
-    mergedCells.splice(existingIndex, 1);
-  } else {
-    // 2. 新規結合を行う場合のチェック
-    
-    // 最下行の場合は下へ結合できない
-    if (r + 1 >= rows) return;
+        // 下のセル(r + 1, c)が「既に別の結合に含まれている」場合は重複防止のため処理しない
+        const isBottomCellAlreadyMerged = mergedCells.some(cell => 
+          cell.col === c && (cell.row === r + 1 || cell.row === r)
+        );
+        if (isBottomCellAlreadyMerged) return;
 
-    // 下のセル(r + 1, c)が「既に別の結合に含まれている」場合は重複防止のため処理しない
-    const isBottomCellAlreadyMerged = mergedCells.some(cell => 
-      cell.col === c && (cell.row === r + 1 || cell.row === r)
-    );
-    if (isBottomCellAlreadyMerged) return;
+        // 新規結合を追加
+        mergedCells.push({
+          row: r,
+          col: c
+        });
+      }
 
-    // 新規結合を追加
-    mergedCells.push({
-      row: r,
-      col: c
-    });
-  }
-
-  // 再描画
-  render();
-}
+      // 再描画
+      render();
+    }
